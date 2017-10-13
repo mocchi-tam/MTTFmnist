@@ -41,10 +41,8 @@ class MTTFModel():
         # 初期化
         tf.reset_default_graph()
         
-        if gpu < 0:
-            device = '/cpu:0'
-        else:
-            device = '/gpu:' + str(gpu)
+        # CPU/GPU の切り替え 未実装
+        #device = '/cpu:0' if gpu < 0 else '/gpu:' + str(gpu)
         
         self.device = device
         self.n_epoch = n_epoch
@@ -60,18 +58,17 @@ class MTTFModel():
         x_image = tf.reshape(self.x, [-1,28,28,1])
         
         # ニューラルネットを構築
-        with tf.device(device):
-            net = tfnet.MTTFNet(Network_layers)
-            net.set_keep_prob(self.keep_prob)
-            self.y = net.make(x_image)
-            loss = net.loss_func(self.y,self.t)
+        net = tfnet.MTTFNet(Network_layers)
+        net.set_keep_prob(self.keep_prob)
+        self.y = net.make(x_image)
+        loss = net.loss_func(self.y,self.t)
         
-            # Optimizer(=Adam)
-            self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+        # Optimizer(=Adam)
+        self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
             
-            # Accuracy setup
-            correct_prediction = tf.equal(tf.argmax(self.y,1), tf.argmax(self.t,1))
-            self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        # Accuracy setup
+        correct_prediction = tf.equal(tf.argmax(self.y,1), tf.argmax(self.t,1))
+        self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     
     def get_acc(self, x,t):
         val_accuracy = self.accuracy.eval(feed_dict={self.x:x,self.t:t,self.keep_prob:1.0})
@@ -79,9 +76,8 @@ class MTTFModel():
     
     def run(self):
         # MNIST を取得
-        from tensorflow.contrib.learn.python.learn.datasets.mnist import read_data_sets
-        #data = tf.contrib.learn.python.learn.datasets.mnist.read_data_sets('MNIST_data/', one_hot=True)
-        data = read_data_sets('MNIST_data/', one_hot=True)
+        #from tensorflow.contrib.learn.python.learn.datasets.mnist import read_data_sets
+        data = tf.examples.tutorials.mnist.input_data.read_data_sets('MNIST_data/', one_hot=True)
         
         saver = tf.train.Saver()
         with tf.Session() as sess:
