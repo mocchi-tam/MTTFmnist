@@ -15,7 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description='Tensorflow example: MNIST')
     parser.add_argument('--batchsize', '-b', type=int, default=256,
                         help='Number of images in each mini-batch')
-    parser.add_argument('--epoch', '-e', type=int, default=3,
+    parser.add_argument('--epoch', '-e', type=int, default=10,
                         help='Number of sweeps over the dataset to train')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
@@ -40,11 +40,8 @@ class MTTFModel():
     def __init__(self, gpu, flag_train, flag_resum, n_epoch, batchsize):
         # 初期化
         tf.reset_default_graph()
-        
-        # CPU/GPU の切り替え 未実装
-        #device = '/cpu:0' if gpu < 0 else '/gpu:' + str(gpu)
-        
-        self.device = device
+        # CPU/GPU のうまい切り替え方を知りたい
+        # device = '/cpu:0' if gpu < 0 else'/gpu:' + str(gpu)
         self.n_epoch = n_epoch
         self.batchsize = batchsize
         self.flag_train = flag_train
@@ -62,10 +59,10 @@ class MTTFModel():
         net.set_keep_prob(self.keep_prob)
         self.y = net.make(x_image)
         loss = net.loss_func(self.y,self.t)
-        
+    
         # Optimizer(=Adam)
         self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
-            
+        
         # Accuracy setup
         correct_prediction = tf.equal(tf.argmax(self.y,1), tf.argmax(self.t,1))
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -93,7 +90,7 @@ class MTTFModel():
                 except:
                     print('MTINFO: The restored model is invalid')
             else:
-                print('MTINFO: All paramteres are initalized')
+                print('MTINFO: All paramteres are initialized')
             
             # 学習フェイズ
             if self.flag_train:
