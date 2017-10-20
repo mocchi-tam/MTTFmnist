@@ -73,8 +73,8 @@ class MTTFModel():
     
     def run(self):
         # MNIST を取得
-        #from tensorflow.contrib.learn.python.learn.datasets.mnist import read_data_sets
-        data = tf.examples.tutorials.mnist.input_data.read_data_sets('MNIST_data/', one_hot=True)
+        from tensorflow.examples.tutorials.mnist import input_data
+        data = input_data.read_data_sets('MNIST_data/', one_hot=True)
         
         saver = tf.train.Saver()
         with tf.Session() as sess:
